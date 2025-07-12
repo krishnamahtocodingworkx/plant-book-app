@@ -8,7 +8,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import PasswordInputField from "../components/inputFields/PasswordInputField";
 import { Formik } from "formik";
 import { SignupSchema } from "../utils/validation";
@@ -20,10 +20,23 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../routes/Navigation";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TextButton from "../components/buttons/TextButton";
+import axios from "axios";
 
 const SignupScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
+  useEffect(() => {
+    async function check() {
+      try {
+        const res = await axios.get("http://localhost:9000/check");
+        console.log("Server response:", res);
+      } catch (error) {
+        console.log("Error connecting to server:", error);
+      }
+    }
+    check();
+  }, []);
+  console.log("SignupScreen rendered");
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView
@@ -53,10 +66,24 @@ const SignupScreen = () => {
                 validationSchema={SignupSchema}
                 onSubmit={(values) => {
                   console.log("Form submitted:", values);
-                  navigation.navigate("VerifyOTP", {
-                    email: values.email,
-                    mode: "signup",
-                  });
+                  axios
+                    .post("http://localhost:9000/api/v1/auth/signup", {
+                      name: values.name,
+                      email: values.email,
+                      password: values.password,
+                      confirmPassword: values.confirmPassword,
+                      role: "user",
+                    })
+                    .then((response) => {
+                      console.log("Signup successful:", response.data);
+                      navigation.navigate("VerifyOTP", {
+                        email: values.email,
+                        mode: "signup",
+                      });
+                    })
+                    .catch((error) => {
+                      console.error("Error during signup:", error);
+                    });
                 }}
               >
                 {({ handleChange, handleSubmit, values, errors, touched }) => (
