@@ -20,6 +20,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../routes/Navigation";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TextButton from "../components/buttons/TextButton";
+// import { API_URL } from "@env";
 
 const LoginScreen = () => {
   const navigation =

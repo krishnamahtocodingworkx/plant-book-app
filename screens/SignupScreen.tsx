@@ -8,7 +8,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import React, { useEffect } from "react";
+import React from "react";
 import PasswordInputField from "../components/inputFields/PasswordInputField";
 import { Formik } from "formik";
 import { SignupSchema } from "../utils/validation";
@@ -21,21 +21,11 @@ import { AuthStackParamList } from "../routes/Navigation";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TextButton from "../components/buttons/TextButton";
 import axios from "axios";
+import config from "../config";
 
 const SignupScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
-  useEffect(() => {
-    async function check() {
-      try {
-        const res = await axios.get("http://localhost:9000/check");
-        console.log("Server response:", res);
-      } catch (error) {
-        console.log("Error connecting to server:", error);
-      }
-    }
-    check();
-  }, []);
   console.log("SignupScreen rendered");
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -67,7 +57,7 @@ const SignupScreen = () => {
                 onSubmit={(values) => {
                   console.log("Form submitted:", values);
                   axios
-                    .post("http://localhost:9000/api/v1/auth/signup", {
+                    .post(`${config.API_URL}/api/v1/auth/signup`, {
                       name: values.name,
                       email: values.email,
                       password: values.password,
