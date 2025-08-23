@@ -76,7 +76,14 @@ const SignupScreen = () => {
                     });
                 }}
               >
-                {({ handleChange, handleSubmit, values, errors, touched }) => (
+                {({
+                  handleChange,
+                  handleSubmit,
+                  handleBlur,
+                  values,
+                  errors,
+                  touched,
+                }) => (
                   <View style={styles.form}>
                     <CustomInputField
                       value={values.name}
@@ -85,6 +92,7 @@ const SignupScreen = () => {
                       label="Name"
                       error={errors.name}
                       touched={touched.name}
+                      onBlur={handleBlur("name")}
                     />
 
                     <CustomInputField
@@ -96,6 +104,7 @@ const SignupScreen = () => {
                       autoCapitalize="none"
                       error={errors.email}
                       touched={touched.email}
+                      onBlur={handleBlur("email")}
                     />
 
                     <PasswordInputField
@@ -105,6 +114,7 @@ const SignupScreen = () => {
                       label="Password"
                       error={errors.password}
                       touched={touched.password}
+                      onBlur={handleBlur("password")}
                     />
 
                     <PasswordInputField
@@ -114,6 +124,7 @@ const SignupScreen = () => {
                       label="Confirm Password"
                       error={errors.confirmPassword}
                       touched={touched.confirmPassword}
+                      onBlur={handleBlur("confirmPassword")}
                     />
 
                     <PrimaryButton title="Signup" onPress={handleSubmit} />

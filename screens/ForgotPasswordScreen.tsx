@@ -55,7 +55,14 @@ const ForgotPasswordScreen = () => {
                   });
                 }}
               >
-                {({ handleChange, handleSubmit, values, errors, touched }) => (
+                {({
+                  handleChange,
+                  handleSubmit,
+                  handleBlur,
+                  values,
+                  errors,
+                  touched,
+                }) => (
                   <View style={styles.form}>
                     <CustomInputField
                       value={values.email}
@@ -66,6 +73,7 @@ const ForgotPasswordScreen = () => {
                       autoCapitalize="none"
                       error={errors.email}
                       touched={touched.email}
+                      onBlur={handleBlur("email")}
                     />
 
                     <PrimaryButton

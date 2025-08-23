@@ -55,7 +55,14 @@ const LoginScreen = () => {
                   navigation.navigate("BottomTabs");
                 }}
               >
-                {({ handleChange, handleSubmit, values, errors, touched }) => (
+                {({
+                  handleChange,
+                  handleBlur,
+                  handleSubmit,
+                  values,
+                  errors,
+                  touched,
+                }) => (
                   <View style={styles.form}>
                     <CustomInputField
                       value={values.email}
@@ -66,6 +73,7 @@ const LoginScreen = () => {
                       autoCapitalize="none"
                       error={errors.email}
                       touched={touched.email}
+                      onBlur={handleBlur("email")}
                     />
 
                     <View>
@@ -76,6 +84,7 @@ const LoginScreen = () => {
                         label="Password"
                         error={errors.password}
                         touched={touched.password}
+                        onBlur={handleBlur("password")}
                       />
                       <TextButton
                         onPress={() => navigation.navigate("ForgotPassword")}

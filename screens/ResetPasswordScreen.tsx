@@ -54,7 +54,14 @@ const ResetPasswordScreen = () => {
                   navigation.navigate("Login");
                 }}
               >
-                {({ handleChange, handleSubmit, values, errors, touched }) => (
+                {({
+                  handleChange,
+                  handleSubmit,
+                  handleBlur,
+                  values,
+                  errors,
+                  touched,
+                }) => (
                   <View style={styles.form}>
                     <PasswordInputField
                       value={values.password}
@@ -63,6 +70,7 @@ const ResetPasswordScreen = () => {
                       label="New Password"
                       error={errors.password}
                       touched={touched.password}
+                      onBlur={handleBlur("password")}
                     />
 
                     <PasswordInputField
@@ -72,6 +80,7 @@ const ResetPasswordScreen = () => {
                       label="Confirm Password"
                       error={errors.confirmPassword}
                       touched={touched.confirmPassword}
+                      onBlur={handleBlur("confirmPassword")}
                     />
 
                     <PrimaryButton

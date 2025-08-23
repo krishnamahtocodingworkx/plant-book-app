@@ -1,4 +1,11 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  NativeSyntheticEvent,
+  StyleSheet,
+  Text,
+  TextInput,
+  TextInputFocusEventData,
+  View,
+} from "react-native";
 import React, { useState } from "react";
 import colors from "../../utils/style";
 
@@ -7,6 +14,7 @@ type InputProps = {
   placeholder: string;
   value: string;
   onChangeText: (text: string) => void;
+  onBlur?: (e: NativeSyntheticEvent<TextInputFocusEventData>) => void; // ✅ optional onBlur handler
   secureTextEntry?: boolean;
   keyboardType?: "default" | "numeric" | "email-address" | "phone-pad";
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
@@ -28,6 +36,7 @@ const CustomInputField = ({
   maxLength,
   error,
   touched,
+  onBlur,
 }: InputProps) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -50,7 +59,10 @@ const CustomInputField = ({
           },
         ]}
         onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
+        onBlur={(e) => {
+          setIsFocused(false);
+          onBlur?.(e); // Call the optional onBlur handler if provided
+        }}
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}

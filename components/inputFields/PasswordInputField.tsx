@@ -4,6 +4,8 @@ import {
   TextInput,
   View,
   TouchableOpacity,
+  NativeSyntheticEvent,
+  TextInputFocusEventData,
 } from "react-native";
 import React, { useState } from "react";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -20,6 +22,7 @@ type PasswordInputProps = {
   maxLength?: number;
   error?: string;
   touched?: boolean;
+  onBlur: (e: NativeSyntheticEvent<TextInputFocusEventData>) => void;
 };
 
 const PasswordInputField = ({
@@ -33,6 +36,7 @@ const PasswordInputField = ({
   maxLength,
   error,
   touched,
+  onBlur,
 }: PasswordInputProps) => {
   const [isFocused, setIsFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -58,7 +62,10 @@ const PasswordInputField = ({
             },
           ]}
           onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onBlur={(e) => {
+            onBlur?.(e);
+            setIsFocused(false);
+          }}
           secureTextEntry={!showPassword}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
