@@ -7,8 +7,9 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+  Button,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import PasswordInputField from "../components/inputFields/PasswordInputField";
 import { Formik } from "formik";
 import { SignupSchema } from "../utils/validation";
@@ -20,13 +21,17 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../routes/Navigation";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TextButton from "../components/buttons/TextButton";
-import axios from "axios";
-import config from "../config";
+import ApiService from "../services";
+import ERROR_TOAST, { SUCCESS_TOAST } from "../utils/toasts";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../redux/store";
+import { setUserDetails } from "../redux/slices/authSlice";
 
 const SignupScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
-  console.log("SignupScreen rendered");
+  const dispatch = useDispatch<AppDispatch>();
+  const [loading, setLoading] = useState(false);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView
@@ -48,32 +53,34 @@ const SignupScreen = () => {
 
               <Formik
                 initialValues={{
-                  name: "",
-                  email: "",
-                  password: "",
-                  confirmPassword: "",
+                  name: "Krishna Mahto",
+                  email: "krishnamahto.dev@gmail.com",
+                  password: "Admin@123",
+                  confirmPassword: "Admin@123",
                 }}
                 validationSchema={SignupSchema}
                 onSubmit={(values) => {
-                  console.log("Form submitted:", values);
-                  axios
-                    .post(`${config.API_URL}/api/v1/auth/signup`, {
-                      name: values.name,
-                      email: values.email,
-                      password: values.password,
-                      confirmPassword: values.confirmPassword,
-                      role: "user",
-                    })
-                    .then((response) => {
-                      console.log("Signup successful:", response.data);
-                      navigation.navigate("VerifyOTP", {
-                        email: values.email,
-                        mode: "signup",
-                      });
+                  setLoading(true);
+                  ApiService.post("auth/signup", {
+                    ...values,
+                    role: "user",
+                  })
+                    .then((res) => {
+                      console.log("Signup response :", res);
+                      if (res.success) {
+                        dispatch(setUserDetails(res.data));
+                        SUCCESS_TOAST(res.message);
+                        navigation.navigate("VerifyOTP", {
+                          email: values.email,
+                          mode: "signup",
+                        });
+                      }
                     })
                     .catch((error) => {
-                      console.error("Error during signup:", error);
-                    });
+                      console.log("Signup error :", error);
+                      ERROR_TOAST(error.message || "Signup failed");
+                    })
+                    .finally(() => setLoading(false));
                 }}
               >
                 {({
@@ -127,7 +134,11 @@ const SignupScreen = () => {
                       onBlur={handleBlur("confirmPassword")}
                     />
 
-                    <PrimaryButton title="Signup" onPress={handleSubmit} />
+                    <PrimaryButton
+                      loading={loading}
+                      title="Signup"
+                      onPress={handleSubmit}
+                    />
                   </View>
                 )}
               </Formik>

@@ -24,13 +24,21 @@ import colors from "../utils/style";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../routes/Navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../redux/store";
+import { authServices } from "../services/authServices";
+import ApiService from "../services";
+import ERROR_TOAST, { SUCCESS_TOAST } from "../utils/toasts";
+import { setToken } from "../redux/slices/authSlice";
 
 type VerifyOTPScreenRouteProp = RouteProp<AuthStackParamList, "VerifyOTP">;
 const CELL_COUNT = 4;
 
 const VerifyOTPScreen = () => {
   const route = useRoute<VerifyOTPScreenRouteProp>();
-  const { email, mode } = route.params;
+  const { email } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
+  const { mode } = route.params;
   const navigation =
     useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
 
@@ -40,22 +48,30 @@ const VerifyOTPScreen = () => {
     value,
     setValue,
   });
+  const [loading, setLoading] = useState(false);
 
   const handleVerify = () => {
-    if (value.length < CELL_COUNT) {
-      Alert.alert("Invalid OTP", "Please enter the full 4-digit code.");
-      return;
-    }
-    // Proceed to Reset Password or Next Step
-    Alert.alert("Success", "OTP Verified Successfully!");
-    if (mode === "login") {
-      // navigation.navigate("Login");
-      navigation.navigate("ResetPassword", {
-        email: "krishnamahto@gmail.com",
-      });
-    } else if (mode === "signup") {
-      navigation.navigate("Home");
-    }
+    setLoading(true);
+    ApiService.post("/auth/verify-email", { email, otp: value })
+      .then((res) => {
+        console.log("OTP Verification Response :", res);
+        if (res.success) {
+          SUCCESS_TOAST(res.message);
+          if (mode === "login") {
+            navigation.navigate("ResetPassword", {
+              email: email,
+            });
+          } else if (mode === "signup") {
+            dispatch(setToken(res.data));
+            navigation.navigate("BottomTabs");
+          }
+        }
+      })
+      .catch((err) => {
+        console.log("OTP Verification Error :", err);
+        ERROR_TOAST(err.message || "OTP Verification Failed");
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -110,6 +126,7 @@ const VerifyOTPScreen = () => {
                 onPress={handleVerify}
                 style={{ width: "100%", marginTop: 10 }}
                 disabled={value.length < CELL_COUNT}
+                loading={loading}
               />
               <TextButton
                 label="Didn't receive the code?"
