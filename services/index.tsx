@@ -9,9 +9,11 @@ import {
   SHOW_INTERNET_TOAST,
   SUCCESS_TOAST,
 } from "../utils/toasts";
+import { BASE_URL } from "../utils/endPoints";
 
 const SOMETHING_WENT_WRONG = "OOPS! Something went wrong";
-const BASE_URL = config.API_URL + "/api/v1/";
+// const BASE_URL = config.API_URL + "/api/v1/";
+
 
 export const status_code = {
   success: 200,
@@ -78,6 +80,7 @@ const createAxiosInstance = (
     (error): Promise<ErrorResponse> => {
       const message =
         error?.response?.data?.message ||
+        error?.response?.message ||
         error?.response?.statusText ||
         error?.message ||
         SOMETHING_WENT_WRONG;
@@ -131,13 +134,13 @@ const $httpFileUpload = createAxiosInstance(BASE_URL, {
  */
 const ApiService = {
   async get<T>(endPoint: string, params?: string) {
-    const response = await $http.get<ApiResponse<T>>(endPoint + (params || ""));
-    return response.data;
+    return $http.get<ApiResponse<T>>(endPoint + (params || ""));
+    // return response.data;
   },
 
   async post<T>(endPoint: string, body: unknown) {
-    const response = await $http.post<ApiResponse<T>>(endPoint, body);
-    return response.data;
+    return $http.post<ApiResponse<T>>(endPoint, body);
+    // return response.data;
   },
 
   async put<T>(endPoint: string, body: unknown) {

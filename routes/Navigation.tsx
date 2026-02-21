@@ -1,10 +1,10 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import LoginScreen from "../screens/LoginScreen";
-import SignupScreen from "../screens/SignupScreen";
-import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
-import ResetPasswordScreen from "../screens/ResetPasswordScreen";
-import VerifyOTPScreen from "../screens/VerifyOTPScreen";
+import LoginScreen from "../screens/auth/LoginScreen";
+import SignupScreen from "../screens/auth/SignupScreen";
+import ForgotPasswordScreen from "../screens/auth/ForgotPasswordScreen";
+import ResetPasswordScreen from "../screens/auth/ResetPasswordScreen";
+import VerifyOTPScreen from "../screens/auth/VerifyOTPScreen";
 import BottomTabs from "./BottomTabs";
 
 export type AuthStackParamList = {

@@ -18,25 +18,24 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import { Image } from "expo-image";
-import PrimaryButton from "../components/buttons/PrimaryButton";
-import TextButton from "../components/buttons/TextButton";
-import colors from "../utils/style";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { AuthStackParamList } from "../routes/Navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../redux/store";
-import { authServices } from "../services/authServices";
-import ApiService from "../services";
-import ERROR_TOAST, { SUCCESS_TOAST } from "../utils/toasts";
-import { setToken } from "../redux/slices/authSlice";
+import { AuthStackParamList } from "../../routes/Navigation";
+import { AppDispatch, RootState } from "../../redux/store";
+import TextButton from "../../components/buttons/TextButton";
+import PrimaryButton from "../../components/buttons/PrimaryButton";
+import colors from "../../utils/style";
+import { verifyOtpThunk } from "../../redux/slices/authThunk";
+import { authServices } from "../../services/authServices";
 
 type VerifyOTPScreenRouteProp = RouteProp<AuthStackParamList, "VerifyOTP">;
 const CELL_COUNT = 4;
 
 const VerifyOTPScreen = () => {
   const route = useRoute<VerifyOTPScreenRouteProp>();
-  const { email } = useSelector((state: RootState) => state.auth);
+  const { loading } = useSelector((state: RootState) => state.auth);
+  const email = useSelector((state: RootState) => state.auth.userDetails?.email);
   const dispatch = useDispatch<AppDispatch>();
   const { mode } = route.params;
   const navigation =
@@ -48,31 +47,20 @@ const VerifyOTPScreen = () => {
     value,
     setValue,
   });
-  const [loading, setLoading] = useState(false);
 
   const handleVerify = () => {
-    setLoading(true);
-    ApiService.post("/auth/verify-email", { email, otp: value })
-      .then((res) => {
-        console.log("OTP Verification Response :", res);
-        if (res.success) {
-          SUCCESS_TOAST(res.message);
-          if (mode === "login") {
-            navigation.navigate("ResetPassword", {
-              email: email,
-            });
-          } else if (mode === "signup") {
-            dispatch(setToken(res.data));
-            navigation.navigate("BottomTabs");
-          }
-        }
-      })
-      .catch((err) => {
-        console.log("OTP Verification Error :", err);
-        ERROR_TOAST(err.message || "OTP Verification Failed");
-      })
-      .finally(() => setLoading(false));
+    dispatch(verifyOtpThunk({ email: email || "", otp: value, mode })).unwrap().then((res) => {
+      console.log("OTP Verification Response :", res);
+      if (mode === "login") {
+        navigation.navigate("ResetPassword", {
+          email: email || "",
+        });
+      } else if (mode === "signup") {
+        navigation.navigate("BottomTabs");
+      }
+    })
   };
+
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -88,7 +76,7 @@ const VerifyOTPScreen = () => {
           >
             <View style={styles.innerContainer}>
               <Image
-                source={require("../assets/banner.gif")}
+                source={require("../../assets/banner.gif")}
                 style={styles.bannerImage}
               />
 
@@ -96,8 +84,8 @@ const VerifyOTPScreen = () => {
 
               <TextButton
                 label="Please enter the OTP code sent to"
-                actionText={email}
-                onPress={() => {}}
+                actionText={email ? ` ${email}` : " your email"}
+                onPress={() => { }}
                 textStyle={{ textAlign: "center" }}
                 containerStyle={{ paddingVertical: 20 }}
               />
@@ -131,7 +119,7 @@ const VerifyOTPScreen = () => {
               <TextButton
                 label="Didn't receive the code?"
                 actionText="Resend"
-                onPress={() => Alert.alert("Resent", "OTP has been resent.")}
+                onPress={() => authServices.resendOtp(email || "")}
                 containerStyle={{ marginTop: 20 }}
               />
             </View>

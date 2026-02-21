@@ -10,28 +10,26 @@ import {
   Button,
 } from "react-native";
 import React, { useState } from "react";
-import PasswordInputField from "../components/inputFields/PasswordInputField";
 import { Formik } from "formik";
-import { SignupSchema } from "../utils/validation";
-import PrimaryButton from "../components/buttons/PrimaryButton";
 import { Image } from "expo-image";
-import CustomInputField from "../components/inputFields/CustomInputField";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { AuthStackParamList } from "../routes/Navigation";
 import { SafeAreaView } from "react-native-safe-area-context";
-import TextButton from "../components/buttons/TextButton";
-import ApiService from "../services";
-import ERROR_TOAST, { SUCCESS_TOAST } from "../utils/toasts";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../redux/store";
-import { setUserDetails } from "../redux/slices/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { AuthStackParamList } from "../../routes/Navigation";
+import { AppDispatch, RootState } from "../../redux/store";
+import { SignupSchema } from "../../utils/validation";
+import CustomInputField from "../../components/inputFields/CustomInputField";
+import PasswordInputField from "../../components/inputFields/PasswordInputField";
+import PrimaryButton from "../../components/buttons/PrimaryButton";
+import TextButton from "../../components/buttons/TextButton";
+import { signupThunk } from "../../redux/slices/authThunk";
 
 const SignupScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const dispatch = useDispatch<AppDispatch>();
-  const [loading, setLoading] = useState(false);
+  const { loading } = useSelector((state: RootState) => state.auth);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView
@@ -46,7 +44,7 @@ const SignupScreen = () => {
           >
             <View style={styles.innerContainer}>
               <Image
-                source={require("../assets/banner.gif")}
+                source={require("../../assets/banner.gif")}
                 style={styles.bannerImage}
               />
               <Text style={styles.heading}>Sign in to your account</Text>
@@ -60,27 +58,13 @@ const SignupScreen = () => {
                 }}
                 validationSchema={SignupSchema}
                 onSubmit={(values) => {
-                  setLoading(true);
-                  ApiService.post("auth/signup", {
-                    ...values,
-                    role: "user",
-                  })
-                    .then((res) => {
-                      console.log("Signup response :", res);
-                      if (res.success) {
-                        dispatch(setUserDetails(res.data));
-                        SUCCESS_TOAST(res.message);
-                        navigation.navigate("VerifyOTP", {
-                          email: values.email,
-                          mode: "signup",
-                        });
-                      }
-                    })
-                    .catch((error) => {
-                      console.log("Signup error :", error);
-                      ERROR_TOAST(error.message || "Signup failed");
-                    })
-                    .finally(() => setLoading(false));
+                  dispatch(signupThunk({ ...values, role: "user" })).unwrap().then((res) => {
+                    console.log("Signup response :", res);
+                    navigation.navigate("VerifyOTP", {
+                      email: values.email,
+                      mode: "signup",
+                    });
+                  });
                 }}
               >
                 {({

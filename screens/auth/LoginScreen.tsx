@@ -9,22 +9,26 @@ import {
   Keyboard,
 } from "react-native";
 import React from "react";
-import PasswordInputField from "../components/inputFields/PasswordInputField";
 import { Formik } from "formik";
-import { LoginSchema } from "../utils/validation";
-import PrimaryButton from "../components/buttons/PrimaryButton";
 import { Image } from "expo-image";
-import CustomInputField from "../components/inputFields/CustomInputField";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { AuthStackParamList } from "../routes/Navigation";
 import { SafeAreaView } from "react-native-safe-area-context";
-import TextButton from "../components/buttons/TextButton";
+import { AuthStackParamList } from "../../routes/Navigation";
+import { LoginSchema } from "../../utils/validation";
+import CustomInputField from "../../components/inputFields/CustomInputField";
+import PasswordInputField from "../../components/inputFields/PasswordInputField";
+import TextButton from "../../components/buttons/TextButton";
+import PrimaryButton from "../../components/buttons/PrimaryButton";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../redux/store";
+import { loginThunk } from "../../redux/slices/authThunk";
 // import { API_URL } from "@env";
 
 const LoginScreen = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
+  const dispatch = useDispatch<AppDispatch>();
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <KeyboardAvoidingView
@@ -39,7 +43,7 @@ const LoginScreen = () => {
           >
             <View style={styles.innerContainer}>
               <Image
-                source={require("../assets/banner.gif")}
+                source={require("../../assets/banner.gif")}
                 style={styles.bannerImage}
               />
               <Text style={styles.heading}>Login to your account</Text>
@@ -52,7 +56,10 @@ const LoginScreen = () => {
                 validationSchema={LoginSchema}
                 onSubmit={(values) => {
                   console.log("Form submitted:", values);
-                  navigation.navigate("BottomTabs");
+                  dispatch(loginThunk(values)).unwrap().then((res) => {
+                    console.log("Login Response :", res);
+                    navigation.navigate("BottomTabs");
+                  })
                 }}
               >
                 {({

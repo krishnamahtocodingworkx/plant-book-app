@@ -12,12 +12,12 @@ import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Formik } from "formik";
 import { Image } from "expo-image";
-import PasswordInputField from "../components/inputFields/PasswordInputField";
-import PrimaryButton from "../components/buttons/PrimaryButton";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { AuthStackParamList } from "../routes/Navigation";
-import { ResetPasswordSchema } from "../utils/validation"; // You can define this in your schema file
+import { AuthStackParamList } from "../../routes/Navigation";
+import { ResetPasswordSchema } from "../../utils/validation";
+import PasswordInputField from "../../components/inputFields/PasswordInputField";
+import PrimaryButton from "../../components/buttons/PrimaryButton";
 
 const ResetPasswordScreen = () => {
   const navigation =
@@ -37,7 +37,7 @@ const ResetPasswordScreen = () => {
           >
             <View style={styles.innerContainer}>
               <Image
-                source={require("../assets/banner.gif")}
+                source={require("../../assets/banner.gif")}
                 style={styles.bannerImage}
               />
 

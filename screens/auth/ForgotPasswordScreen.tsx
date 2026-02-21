@@ -12,13 +12,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import { Image } from "expo-image";
 import { Formik } from "formik";
-import { ForgotPasswordSchema } from "../utils/validation";
-import CustomInputField from "../components/inputFields/CustomInputField";
-import PrimaryButton from "../components/buttons/PrimaryButton";
+
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { AuthStackParamList } from "../routes/Navigation";
-import TextButton from "../components/buttons/TextButton";
+import { AuthStackParamList } from "../../routes/Navigation";
+import { ForgotPasswordSchema } from "../../utils/validation";
+import CustomInputField from "../../components/inputFields/CustomInputField";
+import PrimaryButton from "../../components/buttons/PrimaryButton";
+import TextButton from "../../components/buttons/TextButton";
+import { authServices } from "../../services/authServices";
 
 const ForgotPasswordScreen = () => {
   const navigation =
@@ -38,7 +40,7 @@ const ForgotPasswordScreen = () => {
           >
             <View style={styles.innerContainer}>
               <Image
-                source={require("../assets/banner.gif")}
+                source={require("../../assets/banner.gif")}
                 style={styles.bannerImage}
               />
               <Text style={styles.heading}>Forgot Password</Text>
@@ -49,10 +51,13 @@ const ForgotPasswordScreen = () => {
                 validationSchema={ForgotPasswordSchema}
                 onSubmit={(values) => {
                   console.log("Form submitted:", values);
-                  navigation.navigate("VerifyOTP", {
-                    email: values.email,
-                    mode: "login",
+                  authServices.forgotPassword(values.email).then((res) => {
+                    navigation.navigate("VerifyOTP", {
+                      email: values.email,
+                      mode: "login",
+                    });
                   });
+
                 }}
               >
                 {({
@@ -79,11 +84,11 @@ const ForgotPasswordScreen = () => {
                     <PrimaryButton
                       title="Send OTP"
                       onPress={handleSubmit}
-                      // onPress={() =>
-                      //   navigation.navigate("VerifyOTP", {
-                      //     email: "krishnamahto@gmail.com",
-                      //   })
-                      // }
+                    // onPress={() =>
+                    //   navigation.navigate("VerifyOTP", {
+                    //     email: "krishnamahto@gmail.com",
+                    //   })
+                    // }
                     />
                   </View>
                 )}
