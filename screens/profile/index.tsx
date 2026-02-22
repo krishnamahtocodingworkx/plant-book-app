@@ -7,8 +7,18 @@ import colors from "../../utils/style";
 import OutlinedButton from "../../components/buttons/OutlinedButton";
 import PrimaryButton from "../../components/buttons/PrimaryButton";
 import { ScrollView } from "react-native-gesture-handler";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutThunk } from "../../redux/slices/authThunk";
+import { AppDispatch, RootState } from "../../redux/store";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { AuthStackParamList } from "../../routes/Navigation";
 
 const ProfileScreen = () => {
+  const email = useSelector((state: RootState) => state.auth.userDetails?.email)
+  const dispatch: AppDispatch = useDispatch();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const images = [
     "https://i.pinimg.com/736x/b9/f4/6f/b9f46fdb253ad697c573892332403d7e.jpg",
     "https://i.pinimg.com/736x/38/f4/95/38f49514a075755c8ac7d1bc848bd9fc.jpg",
@@ -17,6 +27,12 @@ const ProfileScreen = () => {
     "https://i.pinimg.com/736x/d0/28/17/d028174d9c366ce45d82d2ff09c0c6d5.jpg",
     "https://i.pinimg.com/736x/8e/9b/de/8e9bde20bcde174b98bb3a84213d2fca.jpg",
   ];
+  const logoutHandler = () => {
+    dispatch(logoutThunk({ email: email || "" })).unwrap().then((res) => {
+      console.log("Logout Response :", res);
+      navigation.navigate("Login");
+    });
+  }
   return (
     // <ScreenWrapper scroll={true} avoidKeyboard={false}>
     <ScrollView style={{ flex: 1 }}>
@@ -58,7 +74,7 @@ const ProfileScreen = () => {
           />
           <PrimaryButton
             title="Follow"
-            onPress={() => console.log("Followed")}
+            onPress={logoutHandler}
           />
         </View>
         <View

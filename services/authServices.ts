@@ -64,9 +64,7 @@ export const authServices = {
             throw error;
         }
     },
-
     logout: async (email: string) => {
-
         try {
             const res = await ApiService.post(endPoints.logout, { email });
             console.log("Logout response in service :", res);

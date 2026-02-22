@@ -51,8 +51,8 @@ const SignupScreen = () => {
 
               <Formik
                 initialValues={{
-                  name: "Krishna Mahto",
-                  email: "krishnamahto.dev@gmail.com",
+                  name: "",
+                  email: "",
                   password: "Admin@123",
                   confirmPassword: "Admin@123",
                 }}
